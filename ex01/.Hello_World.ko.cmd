@@ -1,0 +1,1 @@
+cmd_/root/little-penguin/ex01/Hello_World.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /root/little-penguin/ex01/Hello_World.ko /root/little-penguin/ex01/Hello_World.o /root/little-penguin/ex01/Hello_World.mod.o
