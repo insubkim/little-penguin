@@ -1,4 +1,4 @@
 https://stackoverflow.com/questions/5911849/simple-kernel-module-for-usb
 https://linux.die.net/man/8/hotplug
 www.kernel.org/doc/Documentation/driver-api/usb/writing_usb_driver.rst
-
+https://github.com/torvalds/linux/blob/master/drivers/usb/core/notify.c

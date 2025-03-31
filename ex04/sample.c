@@ -2,61 +2,52 @@
 #include <linux/kernel.h>
 #include <linux/usb.h>
 
-#define USB_KEYBOARD_CLASS         0x03
-#define USB_KEYBOARD_SUBCLASS      0x01
-#define USB_KEYBOARD_PROTOCOL      0x01
-
-static const struct usb_device_id usb_keyboard_id_table[] = {
-    { USB_INTERFACE_INFO(USB_KEYBOARD_CLASS,
-                         USB_KEYBOARD_SUBCLASS,
-                         USB_KEYBOARD_PROTOCOL) },
-    { } 
-};
-MODULE_DEVICE_TABLE(usb, usb_keyboard_id_table);
-
-static int usb_keyboard_probe(struct usb_interface *interface,
-                              const struct usb_device_id *id)
+/* Notifier callback for USB hotplug events */
+static int usb_hotplug_notify(struct notifier_block *nb, unsigned long action, void *data)
 {
-    printk(KERN_INFO "usb_keyboard_hotplug: USB Keyboard plugged in\n");
+    struct usb_device *udev = data;
+
+    switch (action) {
+    case USB_DEVICE_ADD:
+        printk(KERN_INFO "USB Hotplug: Device added (%s)\n", dev_name(&udev->dev));
+        break;
+    case USB_DEVICE_REMOVE:
+        printk(KERN_INFO "USB Hotplug: Device removed (%s)\n", dev_name(&udev->dev));
+        break;
+    default:
+        printk(KERN_INFO "USB Hotplug: Unknown event (action %lu) for device (%s)\n",
+               action, dev_name(&udev->dev));
+        break;
+    }
+    return NOTIFY_OK;
+}
+
+/* Define the notifier block */
+static struct notifier_block usb_hotplug_nb = {
+    .notifier_call = usb_hotplug_notify,
+};
+
+/* Module initialization function */
+static int __init usb_hotplug_init(void)
+{
+    int ret;
+
+     usb_register_notify(&usb_hotplug_nb);
+    printk(KERN_INFO "USB Hotplug: Module loaded\n");
     return 0;
 }
 
-static void usb_keyboard_disconnect(struct usb_interface *interface)
+/* Module exit function */
+static void __exit usb_hotplug_exit(void)
 {
-    printk(KERN_INFO "usb_keyboard_hotplug: USB Keyboard removed\n");
+    usb_unregister_notify(&usb_hotplug_nb);
+    printk(KERN_INFO "USB Hotplug: Module unloaded\n");
 }
 
-/*
-static struct usb_driver usb_keyboard_driver = {
-    .name       = "usb_keyboard_hotplug",
-    .id_table   = usb_keyboard_id_table,
-    .probe      = usb_keyboard_probe,
-    .disconnect = usb_keyboard_disconnect,
-};*/
-
-static struct usb_driver usb_keyboard_driver = {
-    .name       = "usb_keyboard_hotplug",
-    .probe      = usb_keyboard_probe,
-    .disconnect = usb_keyboard_disconnect,
-};
-
-static int __init usb_keyboard_init(void)
-{
-    int ret = usb_register(&usb_keyboard_driver);
-    if (ret)
-        printk(KERN_ERR "usb_keyboard_hotplug: usb_register failed with error %d\n", ret);
-    return ret;
-}
-
-static void __exit usb_keyboard_exit(void)
-{
-    usb_deregister(&usb_keyboard_driver);
-}
-
-module_init(usb_keyboard_init);
-module_exit(usb_keyboard_exit);
+module_init(usb_hotplug_init);
+module_exit(usb_hotplug_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("inskim");
-MODULE_DESCRIPTION("My USB Keyboard Hotplug Module");
+MODULE_AUTHOR("Your Name");
+MODULE_DESCRIPTION("Kernel module that logs USB hotplug events");
 
