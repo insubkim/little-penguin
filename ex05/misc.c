@@ -18,9 +18,7 @@ static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_
 	char *s = "inskim";
 	size_t err = 0;	
 
-	if (size > 6) 
-		size = 6;
-   	
+        size = min_t(size_t, size, 6);	
 	err = copy_to_user(user, s, size);
 	
 	if (err != 0)
