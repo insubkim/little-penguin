@@ -13,10 +13,11 @@ int main()
     int bytes = read(fd, f, 1023);
 
     printf("read %d\n", bytes);
+    printf("read str :[%s]\n", f);
+	
+//    bytes = write(fd, f, 0);
 
-    bytes = write(fd, f, 0);
-
-    printf("write %d\n", bytes);
+//    printf("write %d\n", bytes);
 
     bytes = close(fd);
 
