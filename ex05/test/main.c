@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
 
 int main()
 {
@@ -18,6 +19,17 @@ int main()
 //    bytes = write(fd, f, 0);
 
 //    printf("write %d\n", bytes);
+	time_t t;
+	time(&t);
+	while (1)
+	{
+		time_t t2;
+		time(&t2);
+	printf("[%d] [%d] [%d]\n", t, t2, t2 - t);
+		if (t2 - t > 10)
+			break;
+		sleep(1);
+	}
 
     bytes = close(fd);
 
