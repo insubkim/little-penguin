@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <time.h>
+
+int main()
+{
+	int fd = open("/dev/fortytwo", O_RWDONLY);
+
+	printf("open file %d\n", fd);
+
+	char f[1024] = {0,};
+
+	//int bytes = read(fd, f, 1023);
+
+	//printf("read %d\n", bytes);
+	//printf("read str :[%s]\n", f);
+	
+	int w_bytes = write(fd, "inskim", 6);
+
+	printf("write %d\n", w_bytes);
+
+	int ret = close(fd);
+
+	printf("close %d\n", ret);
+	return 0;
+}
