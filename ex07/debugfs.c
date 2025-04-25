@@ -6,6 +6,7 @@
 #include <asm/uaccess.h>
 #include <linux/debugfs.h>
 #include <linux/jiffies.h>
+#include <linux/spinlock.h>
 
 //https://www.kernel.org/doc/html/v6.15-rc3/filesystems/debugfs.html
 
@@ -77,6 +78,7 @@ static ssize_t jiffies_read (struct file *file, char __user *user, size_t size, 
 
 char	g_foo[4096];
 int	g_foo_len;
+DEFINE_SPINLOCK(lock);
 
 static ssize_t foo_read (struct file *file, char __user *user, size_t size, loff_t *loff)
 {
@@ -86,12 +88,13 @@ static ssize_t foo_read (struct file *file, char __user *user, size_t size, loff
 
         printk(KERN_INFO "foo_read *loff [%lld] !\n", *loff);
 	// mutex lock
+	spin_lock(&lock);
 	if (*loff > g_foo_len)
 		return 0;
 
         size = min_t(size_t, size, g_foo_len - *loff);
         err = copy_to_user(user, g_foo + *loff, size);
-	// mutex unlock
+	spin_unlock(&lock);
 	*loff += size - err;
 
         if (err != 0)
@@ -113,17 +116,19 @@ static ssize_t foo_write (struct file *file, const char __user *user, size_t siz
 	size_t err = 0;
 
 	// mutex lock
+	spin_lock(&lock);
 	if (*loff > sizeof(g_foo))
 	{
-        	printk(KERN_INFO "foo_write size 0 loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
+        	// printk(KERN_INFO "foo_write size 0 loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
 		return 0;
 	}
 
-       	printk(KERN_INFO "foo_write size loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
+       	// printk(KERN_INFO "foo_write size loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
         size = min_t(size_t, size, sizeof(g_foo) - *loff);	
-        printk(KERN_INFO "foo_write size [%zu] !\n", size);
+        // printk(KERN_INFO "foo_write size [%zu] !\n", size);
 	err = copy_from_user(g_foo, user, size);
 	// mutex unlock
+	spin_unlock(&lock);
         printk(KERN_INFO "foo_write err byte [%zu] !\n", err);
         printk(KERN_INFO "foo_write g_foo [%s] !\n", g_foo);
 	*loff += size - err;
