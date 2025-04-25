@@ -75,10 +75,64 @@ static ssize_t jiffies_read (struct file *file, char __user *user, size_t size, 
         return size;
 }
 
+char	g_foo[4096];
+int	g_foo_len;
+
+static ssize_t foo_read (struct file *file, char __user *user, size_t size, loff_t *loff)
+{
+        printk(KERN_INFO "foo_read CALLED !\n");
+
+        size_t err = 0;
+
+        printk(KERN_INFO "foo_read *loff [%lld] !\n", *loff);
+	// mutex lock
+	if (*loff > g_foo_len)
+		return 0;
+
+        size = min_t(size_t, size, g_foo_len - *loff);
+        err = copy_to_user(user, g_foo + *loff, size);
+	// mutex unlock
+	*loff += size - err;
+
+        if (err != 0)
+                printk(KERN_INFO "foo_read - copy_to_user return err[%zu] !\n", err);
+
+        return size;
+}
+
 static ssize_t my_write (struct file *file, const char __user *user, size_t size, loff_t *loff)
 {
         printk(KERN_INFO "my_write CALLED !\n");
-    return 0;
+    	return 0;
+}
+
+static ssize_t foo_write (struct file *file, const char __user *user, size_t size, loff_t *loff)
+{
+        printk(KERN_INFO "foo_write CALLED !\n");
+
+	size_t err = 0;
+
+	// mutex lock
+	if (*loff > sizeof(g_foo))
+	{
+        	printk(KERN_INFO "foo_write size 0 loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
+		return 0;
+	}
+
+       	printk(KERN_INFO "foo_write size loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
+        size = min_t(size_t, size, sizeof(g_foo) - *loff);	
+        printk(KERN_INFO "foo_write size [%zu] !\n", size);
+	err = copy_from_user(g_foo, user, size);
+	// mutex unlock
+        printk(KERN_INFO "foo_write err byte [%zu] !\n", err);
+        printk(KERN_INFO "foo_write g_foo [%s] !\n", g_foo);
+	*loff += size - err;
+	g_foo_len += size - err;
+        printk(KERN_INFO "foo_write *loff [%lld] !\n", *loff);
+	if (err != 0)
+                printk(KERN_INFO "foo_read - copy_to_user return err[%zu] !\n", err);
+
+	return 0;
 }
 
 static int my_release (struct inode *inode, struct file *file)
@@ -103,6 +157,14 @@ static struct file_operations fops_jiffies = {
     .write = my_write
 };
 
+static struct file_operations fops_foo = {
+    .owner = THIS_MODULE,
+    .open = my_open,
+    .release = my_release,
+    .read = foo_read,
+    .write = foo_write
+};
+
 struct dentry* g_log_dir;
 
 static int debugfs_init(void)
@@ -122,7 +184,7 @@ static int debugfs_init(void)
 
 	struct dentry *id = debugfs_create_file("id", 0777, log_dir, (void*)&value, &fops);
 	struct dentry *jiffies = debugfs_create_file("jiffies", 0444, log_dir, (void*)&value, &fops_jiffies);
-	struct dentry *foo = debugfs_create_file("foo", 0744, log_dir, (void*)&value, &fops);
+	struct dentry *foo = debugfs_create_file("foo", 0744, log_dir, (void*)&value, &fops_foo);
 
 	if ((id == NULL) || (jiffies == NULL) || (foo == NULL))
 	{
