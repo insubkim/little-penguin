@@ -14,12 +14,16 @@ static int my_open(struct inode *inode, struct file *file)
 static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_t *loff)
 {
 	printk(KERN_INFO "my_read CALLED !\n");
-	
+	printk(KERN_INFO "my_read loff [%lld]!\n", *loff);
+		
 	char *s = "inskim";
 	size_t err = 0;	
 
-        size = min_t(size_t, size, 6);	
-	err = copy_to_user(user, s, size);
+	if (*loff > 6)
+		return 0;
+        size = min_t(size_t, size, 7 - *loff);	
+	err = copy_to_user(user, s + *loff, size);
+	*loff += size;	
 	
 	if (err != 0)
 		printk(KERN_INFO "my_read - copy_to_user return err[%zu] !\n", err);
