@@ -47,8 +47,8 @@ static ssize_t jiffies_read(struct file *file, char __user *user, size_t size, l
 	
 	while (jiffies > 0)
 	{
-	s[i++] = jiffies % 10 + '0';
-	jiffies /= 10;
+		s[i++] = jiffies % 10 + '0';
+		jiffies /= 10;
 	}
 
 	len = i;
@@ -88,7 +88,10 @@ static ssize_t foo_read (struct file *file, char __user *user, size_t size, loff
 	spin_lock(&lock);
 	
 	if (*loff + 1 >= g_foo_len)
+	{
+		spin_unlock(&lock);
 		return 0;
+	}
 
 	size = min_t(size_t, size, g_foo_len - *loff);
 	
@@ -123,6 +126,7 @@ static ssize_t foo_write (struct file *file, const char __user *user, size_t siz
 	
 	if (*loff + 1 >= sizeof(g_foo))
 	{
+		spin_unlock(&lock);
 		printk(KERN_INFO "foo_write eof loff[%lld] g_foo size[%zu] !\n", *loff, sizeof(g_foo));
 		return 0;
 	}
@@ -145,9 +149,9 @@ static ssize_t foo_write (struct file *file, const char __user *user, size_t siz
 	printk(KERN_INFO "g_foo [%s] \n", g_foo);
 	
 	if (err != 0)
-		printk(KERN_INFO "foo_read - copy_to_user return err[%zu] !\n", err);
+		printk(KERN_INFO "foo_read - copy_from_user return err[%zu] !\n", err);
 
-	return 0;
+	return size - err;
 }
 
 static int my_release (struct inode *inode, struct file *file)
