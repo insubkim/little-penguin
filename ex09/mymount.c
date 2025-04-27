@@ -1,9 +1,18 @@
 #include <linux/fs.h>
 #include <linux/miscdevice.h>
 #include <linux/mutex.h>
-#include <linux/module.h>	/* Needed by all modules */
-#include <linux/kernel.h>	/* Needed for KERN_INFO */
+#include <linux/module.h>	
+#include <linux/kernel.h>	
 #include <asm/uaccess.h>
+
+#include <linux/mount.h>
+#include <linux/nsproxy.h>
+#include <linux/sched.h>
+#include <linux/dcache.h>
+#include <linux/path.h>
+#include <linux/init.h>
+#include <linux/slab.h>
+
 
 static int my_open(struct inode *inode, struct file *file)
 {
@@ -11,9 +20,78 @@ static int my_open(struct inode *inode, struct file *file)
     return 0;
 }
 
+
+/*
+struct vfsmount {
+	struct dentry *mnt_root;	
+	struct super_block *mnt_sb;	
+	int mnt_flags;
+} __randomize_layout;
+*/
+
+/*
+struct dentry {
+	unsigned int d_flags;		
+	seqcount_t d_seq;		
+	struct hlist_bl_node d_hash;	
+	struct dentry *d_parent;	
+	struct qstr d_name;
+	struct inode *d_inode;		
+	unsigned char d_iname[DNAME_INLINE_LEN];	
+
+	
+	struct lockref d_lockref;	
+	const struct dentry_operations *d_op;
+	struct super_block *d_sb;	
+	unsigned long d_time;		
+	void *d_fsdata;			
+
+	union {
+		struct list_head d_lru;		
+		wait_queue_head_t *d_wait;	
+	};
+	struct list_head d_child;	
+	struct list_head d_subdirs;	
+	union {
+		struct hlist_node d_alias;	
+		struct hlist_bl_node d_in_lookup_hash;	
+	 	struct rcu_head d_rcu;
+	} d_u;
+} __randomize_layout;
+ */
+
+/*
 static void iter_filesystem(void)
 {
-    void *it = current->namespace;
+    struct mount *mnt;
+    struct path path;
+    int ret = kern_path("/", LOOKUP_DIRECTORY, &path); 
+    
+    list_for_each_entry(mnt, &path->d_sb->smounts, mnt_list) {
+        printk("Mount point: %s\n", mnt->mnt_root->d_name.name); // Access mount point
+        printk("Filesystem type: %s\n", mnt->mnt_sb->s_type->name); // Access filesystem type
+    }
+}
+*/
+
+static void iter_mnt(void)
+{
+    struct mnt_namespace *ns = current->nsproxy->mnt_ns;
+    struct mount *mnt;
+
+    list_for_each_entry(mnt, &ns->list, mnt_list) {
+        char buf[1024] = {0,};
+        struct path p = {
+            .mnt    = &mnt->mnt,
+            .dentry = mnt->mnt.mnt_root,
+        };
+        char *path_str = d_path(&p, buf, sizeof(buf));
+        if (!IS_ERR(path_str)) {
+            pr_info("Mount point: %s\n", path_str);
+            pr_info("Filesystem type: %s\n",
+                    mnt->mnt.mnt_sb->s_type->name);
+        }
+    }
 }
 
 
@@ -66,6 +144,9 @@ static struct miscdevice my_driver = {
 
 static int misc_init(void)
 {
+    //iter_filesystem();
+    iter_mnt();
+    
     return misc_register(&my_driver);
 }
 
