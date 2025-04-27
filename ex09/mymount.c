@@ -11,6 +11,12 @@ static int my_open(struct inode *inode, struct file *file)
     return 0;
 }
 
+static void iter_filesystem(void)
+{
+    void *it = current->namespace;
+}
+
+
 static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_t *loff)
 {
 	printk(KERN_INFO "my_read CALLED !\n");
@@ -21,7 +27,7 @@ static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_
 
 	if (*loff > 6)
 		return 0;
-        size = min_t(size_t, size, 7 - *loff);	
+    size = min_t(size_t, size, 7 - *loff);	
 	err = copy_to_user(user, s + *loff, size);
 	*loff += size;	
 	
@@ -54,7 +60,7 @@ static struct file_operations my_fops = {
 
 static struct miscdevice my_driver = {
     .minor = MISC_DYNAMIC_MINOR,
-    .name = "fortytwo",
+    .name = "mymount",
     .fops = &my_fops
 };
 

@@ -17,3 +17,5 @@ cs find 검색유형 keyword
 8 (i) - 이 파일을 include 하는 파일을 검색
 출처: https://harryp.tistory.com/131 [Park's Life:티스토리]
 
+
+https://stackoverflow.com/questions/8702261/get-filesystem-mount-point-in-kernel-module

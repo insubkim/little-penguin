@@ -59,6 +59,17 @@ set tags+=/usr/src/linux-5.10.0/TAGS
 set tags+=./TAGS;/
 
 
+cscope 추가
+$ cd /root/linux-5.10.0/
+$ find . -name "*.[chS]" > cscope.files
+$ cscope -bqk
+
+" cscope.out 파일 등록
+cs add /usr/src/linux-5.10.0/cscope.out
+
+" 예시: printk 호출 위치 찾기
+:cs find c printk
+
 
 
 
