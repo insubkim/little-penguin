@@ -77,10 +77,10 @@ static void iter_filesystem(void)
 static void iter_mnt(void)
 {
     struct mnt_namespace *ns = current->nsproxy->mnt_ns;
-    struct mount *mnt;
+    struct mnt_namespace *mnt;
 
-    list_for_each_entry(mnt, &ns->list, mnt_list) {
-        char buf[1024] = {0,};
+    list_for_each_entry(mnt, ns->list, list) {
+        /*char buf[1024] = {0,};
         struct path p = {
             .mnt    = &mnt->mnt,
             .dentry = mnt->mnt.mnt_root,
@@ -90,7 +90,7 @@ static void iter_mnt(void)
             pr_info("Mount point: %s\n", path_str);
             pr_info("Filesystem type: %s\n",
                     mnt->mnt.mnt_sb->s_type->name);
-        }
+        }*/
     }
 }
 
