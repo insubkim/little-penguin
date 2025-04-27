@@ -1,0 +1,19 @@
+cscope 사용법
+db 생성
+find ./ -name '*.[cCsShH]' > file_list$ cscope -i file_list 
+cscope -i file_list
+
+검색
+cs find 검색유형 keyword
+
+0 (s) - 키워드를 검색
+
+1 (g) - 선언 (정의) 되어 있는 부분으로 이동
+2 (d) - 이 함수가 호출 하는 함수 목록 출력
+3 (c) - 이 함수를 호출하는 함수 출력
+4 (t) - 문자열 검색
+5 (e) - 확장 정규식을 사용하여 검색
+7 (f) - 파일 검색 (파일 이름 검색)
+8 (i) - 이 파일을 include 하는 파일을 검색
+출처: https://harryp.tistory.com/131 [Park's Life:티스토리]
+

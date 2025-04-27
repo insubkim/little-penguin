@@ -1,0 +1,16 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+misc_exit	mymount.c	/^module_exit(misc_exit);$/;"	v
+misc_exit	mymount.c	/^static void misc_exit(void)$/;"	f	file:
+misc_init	mymount.c	/^module_init(misc_init);$/;"	v
+misc_init	mymount.c	/^static int misc_init(void)$/;"	f	file:
+my_driver	mymount.c	/^static struct miscdevice my_driver = {$/;"	v	typeref:struct:miscdevice	file:
+my_fops	mymount.c	/^static struct file_operations my_fops = {$/;"	v	typeref:struct:file_operations	file:
+my_open	mymount.c	/^static int my_open(struct inode *inode, struct file *file)$/;"	f	file:
+my_read	mymount.c	/^static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_t *loff)$/;"	f	file:
+my_release	mymount.c	/^static int my_release (struct inode *inode, struct file *file)$/;"	f	file:
+my_write	mymount.c	/^static ssize_t my_write (struct file *file, const char __user *user, size_t size, loff_t *loff)$/;"	f	file:
