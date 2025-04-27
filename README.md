@@ -48,3 +48,17 @@ let g:tagbar_autofocus = 1
 
 let g:tagbar_autoclose   = 1
 
+3. 커널 소스 참조
+
+cd /root/linux-6.14
+ctags -R .
+
+태그 추가
+vim ~/.vimrc
+set tags+=/usr/src/linux-5.10.0/TAGS
+set tags+=./TAGS;/
+
+
+
+
+

@@ -29,3 +29,8 @@ let g:tagbar_autofocus = 1
 " 태그 점프 후 Tagbar를 자동으로 닫고 편집 창으로 복귀
 let g:tagbar_autoclose   = 1
 
+" tags 옵션에 커널 TAGS 파일 경로 추가
+set tags+=/root/linux-6.14/tags
+
+" (선택) 편집 중인 디렉토리 내 TAGS도 자동 검색
+set tags+=./tags;/
