@@ -1,0 +1,37 @@
+#include <linux/module.h>	
+#include <linux/kernel.h>	
+
+#include <linux/sched.h>
+
+//task struct
+//https://elixir.bootlin.com/linux/v4.3/source/include/linux/sched.h#L1378
+//fs_struct
+//https://elixir.bootlin.com/linux/v4.7/source/include/linux/fs_struct.h#L26
+
+static int misc_init(void)
+{
+    printk(KERN_INFO "PID: %d\n", current->pid);
+    
+    struct task_struct *c = current;
+
+    struct fs_struct *fs = current->fs;
+
+
+   // list_for_each_entry(tmp, head, mem)
+   // {
+
+    //    printk(KERN_INFO,  "PID: %d\n", current->pid);
+    //}
+
+    return 0;
+}
+
+void misc_exit(void)
+{
+    printk("end\n");
+}
+
+module_init(misc_init);
+module_exit(misc_exit);
+
+MODULE_LICENSE("GPL");
