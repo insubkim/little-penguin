@@ -1,17 +1,51 @@
-#include <linux/module.h>       /* Needed by all modules */
-#include <linux/kernel.h>       /* Needed for KERN_INFO */
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/usb.h>
 
-int init_module(void)
+/* Notifier callback for USB hotplug events */
+static int usb_hotplug_notify(struct notifier_block *nb, unsigned long action, void *data)
 {
-        printk(KERN_INFO "installed USB Detector !\n");
+    struct usb_device *udev = data;
 
-        /*
-         * A non 0 return means init_module failed; module can't be loaded.
-         */
-        return 0;
+    switch (action) {
+    case USB_DEVICE_ADD:
+        printk(KERN_INFO "USB Hotplug: Device added (%s)\n", dev_name(&udev->dev));
+        break;
+    case USB_DEVICE_REMOVE:
+        printk(KERN_INFO "USB Hotplug: Device removed (%s)\n", dev_name(&udev->dev));
+        break;
+    default:
+        printk(KERN_INFO "USB Hotplug: Unknown event (action %lu) for device (%s)\n",
+               action, dev_name(&udev->dev));
+        break;
+    }
+    return NOTIFY_OK;
 }
 
-void cleanup_module(void)
+/* Define the notifier block */
+static struct notifier_block usb_hotplug_nb = {
+    .notifier_call = usb_hotplug_notify,
+};
+
+/* Module initialization function */
+static int __init usb_hotplug_init(void)
 {
-        printk(KERN_INFO "Cleaning up USB detector module.\n");
+    usb_register_notify(&usb_hotplug_nb);
+    printk(KERN_INFO "USB Hotplug: Module loaded\n");
+    return 0;
 }
+
+/* Module exit function */
+static void __exit usb_hotplug_exit(void)
+{
+    usb_unregister_notify(&usb_hotplug_nb);
+    printk(KERN_INFO "USB Hotplug: Module unloaded\n");
+}
+
+module_init(usb_hotplug_init);
+module_exit(usb_hotplug_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Your Name");
+MODULE_DESCRIPTION("Kernel module that logs USB hotplug events");
+

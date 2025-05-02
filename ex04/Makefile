@@ -1,4 +1,4 @@
-obj-m += sample.o
+obj-m += usb_detector.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules

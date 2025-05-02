@@ -1,7 +1,7 @@
 #include <linux/fs.h>
 #include <linux/miscdevice.h>
 #include <linux/mutex.h>
-#include <linux/module.h>	/* Needed by all modules */
+#include <linux/module.`h>	/* Needed by all modules */
 #include <linux/kernel.h>	/* Needed for KERN_INFO */
 #include <asm/uaccess.h>
 #include <linux/debugfs.h>
@@ -190,11 +190,11 @@ static int debugfs_init(void)
 {
 	printk(KERN_INFO "debugfs_init!\n");
 	
-	struct dentry* log_dir = debugfs_create_dir ("fortytwo", NULL);
+	struct dentry* log_dir = debugfs_create_dir("fortytwo", NULL);
 	if (log_dir == NULL)
 	{
-	printk(KERN_INFO "debugfs - dir create failed [%d]!\n", ENODEV);
-	return 1;	
+	    printk(KERN_INFO "debugfs - dir create failed [%d]!\n", ENODEV);
+	    return 1;	
 	}
 	
 	g_log_dir = log_dir;
@@ -207,8 +207,8 @@ static int debugfs_init(void)
 
 	if ((id == NULL) || (jiffies == NULL) || (foo == NULL))
 	{
-	printk(KERN_INFO "debugfs - file create failed [%d]!\n", ENODEV);
-	return 1;	
+    	printk(KERN_INFO "debugfs - file create failed [%d]!\n", ENODEV);
+	    return 1;	
 	}
 	
 	return 0;

@@ -2,6 +2,10 @@
 #include <linux/kernel.h>	
 
 #include <linux/list.h>
+#include <asm-generic/current.h>
+#include "linux/thread_info.h"
+// 출처: https://woodz.tistory.com/70 [Daeseok's Blog:티스토리]
+
 
 typedef struct node {
     int data;
@@ -11,7 +15,9 @@ typedef struct node {
 // 출처 https://secmem.tistory.com/242
 static int misc_init(void)
 {
-   
+   struct thread_info *info = current;
+
+
     LIST_HEAD(list);
 
     t_node node1;

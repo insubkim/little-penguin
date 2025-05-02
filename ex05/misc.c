@@ -21,7 +21,8 @@ static ssize_t my_read (struct file *file, char __user *user, size_t size, loff_
 
 	if (*loff > 6)
 		return 0;
-        size = min_t(size_t, size, 7 - *loff);	
+    
+    size = min_t(size_t, size, 7 - *loff);	
 	err = copy_to_user(user, s + *loff, size);
 	*loff += size;	
 	
