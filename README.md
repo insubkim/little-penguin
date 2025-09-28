@@ -1,4 +1,4 @@
-# 과제명 little-penguin - 리눅스 커널 모듈 개발
+# 리눅스 커널 모듈 개발
 
 간단한 char device 부터 filesystem 을 출력하는 커널 모듈 개발
 
